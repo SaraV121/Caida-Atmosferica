@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simulador interactivo de caída atmosférica mediante Euler, Heun y Runge-Kutta 4.">
+    <title>Simulador de Caída Atmosférica 2027</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="encabezado">
+        <div class="contenedor">
+            <p class="subtitulo">SIMULACIÓN NUMÉRICA · 2027</p>
+            <h1>Caída Atmosférica de un Fragmento de Asteroide</h1>
+        </div>
+    </header>
+
+    <main class="contenedor">
+
+        <section class="seccion introduccion">
+            <h2>Planteamiento del problema</h2>
+            <p>
+                En este escenario académico se estudia la caída de un fragmento de asteroide
+                bajo la acción de la gravedad terrestre y de una fuerza de resistencia del aire
+                proporcional al cuadrado de la velocidad. El objetivo es aproximar su velocidad
+                a lo largo del tiempo y comparar métodos numéricos con una solución analítica.
+            </p>
+            <div class="ecuacion">m · dv/dt = -mg + kv²</div>
+            <p>
+                Se utilizarán los métodos de Euler, Heun y Runge-Kutta de cuarto orden (RK4).
+                Los resultados se contrastarán con la solución analítica del modelo.
+            </p>
+        </section>
+
+        <section class="seccion">
+            <h2>1. Modelo matemático</h2>
+            <p>La ecuación diferencial de segundo miembro se expresa como una ecuación ordinaria de primer orden:</p>
+            <div class="ecuacion">dv/dt = f(t,v) = -g + (k/m) · v²</div>
+            <p>Con la condición inicial:</p>
+            <div class="ecuacion">v(0) = v₀</div>
+            <p>Donde:</p>
+            <ul class="lista-modelo">
+                <li><strong>m:</strong> masa del fragmento, en kilogramos (kg).</li>
+                <li><strong>k:</strong> coeficiente de resistencia, en kg/m.</li>
+                <li><strong>g:</strong> aceleración de la gravedad, en m/s².</li>
+                <li><strong>v₀:</strong> velocidad inicial, en m/s.</li>
+                <li><strong>h:</strong> tamaño del paso numérico, en segundos (s).</li>
+            </ul>
+        </section>
+
+        <section class="seccion">
+            <h2>2. Parámetros de simulación</h2>
+            <div class="formulario">
+                <div class="campo">
+                    <label for="masa">Masa del fragmento (kg)</label>
+                    <input type="number" id="masa" value="5" min="0.01" step="any">
+                </div>
+                <div class="campo">
+                    <label for="coeficiente">Coeficiente de resistencia k (kg/m)</label>
+                    <input type="number" id="coeficiente" value="0.05" min="0" step="any">
+                </div>
+                <div class="campo">
+                    <label for="velocidadInicial">Velocidad inicial (m/s)</label>
+                    <input type="number" id="velocidadInicial" value="0" step="any">
+                </div>
+                <div class="campo">
+                    <label for="tiempo">Tiempo de simulación (s)</label>
+                    <input type="number" id="tiempo" value="15" min="0.01" step="any">
+                </div>
+                <div class="campo">
+                    <label for="paso">Tamaño de paso h (s)</label>
+                    <input type="number" id="paso" value="0.5" min="0.000001" step="any">
+                </div>
+                <div class="campo">
+                    <label for="gravedad">Gravedad (m/s²)</label>
+                    <input type="number" id="gravedad" value="9.81" min="0.000001" step="any">
+                </div>
+            </div>
+            <button id="btnSimular" type="button">Ejecutar simulación</button>
+            <button id="btnRestablecer" type="button" class="secundario">Restablecer valores</button>
+            <p id="mensaje" class="mensaje" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="seccion">
+            <h2>3. Resultados generales</h2>
+            <p>Valores de velocidad al finalizar el tiempo de simulación seleccionado.</p>
+            <div class="resultados" id="resultados">
+                <div class="tarjeta"><span>Velocidad terminal</span><strong id="velocidadTerminal">--</strong><small>m/s</small></div>
+                <div class="tarjeta"><span>Euler</span><strong id="resultadoEuler">--</strong><small>m/s</small></div>
+                <div class="tarjeta"><span>Heun</span><strong id="resultadoHeun">--</strong><small>m/s</small></div>
+                <div class="tarjeta"><span>Runge-Kutta 4</span><strong id="resultadoRK4">--</strong><small>m/s</small></div>
+                <div class="tarjeta"><span>Solución analítica</span><strong id="resultadoAnalitico">--</strong><small>m/s</small></div>
+            </div>
+        </section>
+
+        <section class="seccion">
+            <h2>4. Tabla de iteraciones</h2>
+            <p>Comparación de las velocidades obtenidas en cada instante de tiempo.</p>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Iteración</th><th>Tiempo (s)</th><th>Euler (m/s)</th>
+                            <th>Heun (m/s)</th><th>RK4 (m/s)</th><th>Analítica (m/s)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaResultados">
+                        <tr><td colspan="6">Ejecute la simulación para ver los resultados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="seccion">
+            <h2>5. Análisis de errores</h2>
+            <p>Se calcula el error absoluto de cada método respecto a la solución analítica.</p>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Iteración</th><th>Tiempo (s)</th><th>Error Euler (m/s)</th>
+                            <th>Error Heun (m/s)</th><th>Error RK4 (m/s)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaErrores">
+                        <tr><td colspan="5">Los errores aparecerán después de simular.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="seccion">
+            <h2>6. Gráfica comparativa de velocidades</h2>
+            <p>Evolución de la velocidad respecto al tiempo para los tres métodos y la solución analítica.</p>
+            <div class="grafica"><canvas id="graficoVelocidad"></canvas></div>
+        </section>
+
+        <section class="seccion">
+            <h2>7. Solución analítica</h2>
+            <p>
+                Para el caso de velocidad inicial nula (v₀ = 0), la solución exacta del modelo es:
+            </p>
+            <div class="ecuacion">v(t) = -√(mg/k) · tanh(√(gk/m) · t)</div>
+            <p>
+                La velocidad terminal en magnitud es V<sub>t</sub> = √(mg/k). La solución analítica
+                permite calcular el valor de referencia y determinar el error absoluto de cada
+                aproximación numérica.
+            </p>
+            <p class="nota">
+                El programa también calcula la solución para otras condiciones iniciales dentro
+                del dominio matemático de la ecuación.
+            </p>
+        </section>
+
+        <section class="seccion">
+            <h2>8. Simulación interactiva: influencia del tamaño de paso</h2>
+            <p>
+                Esta prueba toma como referencia t = 5 segundos. Modifique h para observar
+                cómo cambia la aproximación de Euler, Heun y RK4 frente a la solución analítica.
+                Se utilizan los parámetros de masa, resistencia, velocidad inicial y gravedad
+                ingresados en la simulación principal.
+            </p>
+            <div class="control-paso">
+                <label for="pasoComparacion">Tamaño de paso h: <strong id="valorPasoComparacion">0.50 s</strong></label>
+                <input type="range" id="pasoComparacion" min="0.05" max="1" step="0.05" value="0.5">
+                <div class="rango-extremos"><span>0.05 s</span><span>1.00 s</span></div>
+                <button id="btnCompararPaso" type="button">Calcular comparación en t = 5 s</button>
+                <p id="mensajeComparacion" class="mensaje" role="status" aria-live="polite"></p>
+            </div>
+            <div class="tabla-contenedor">
+                <table class="tabla-comparacion">
+                    <thead>
+                        <tr><th>Método</th><th>Velocidad aproximada (m/s)</th><th>Error absoluto (m/s)</th></tr>
+                    </thead>
+                    <tbody id="tablaComparacionPaso">
+                        <tr><td colspan="3">Mueva el control y ejecute la comparación.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="nota-panel" id="interpretacionPaso">
+                La comparación aparecerá aquí.
+            </div>
+        </section>
+
+        <section class="seccion">
+            <h2>9. Comparación del error según el tamaño de paso</h2>
+            <p>
+                Se comparan varios tamaños de paso (h = 1, 0.5, 0.25 y 0.1 s) en el instante
+                t = 5 s. Un error menor indica una aproximación más cercana a la solución analítica.
+            </p>
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr><th>h (s)</th><th>Error Euler</th><th>Error Heun</th><th>Error RK4</th></tr>
+                    </thead>
+                    <tbody id="tablaErroresPaso">
+                        <tr><td colspan="4">Ejecute la comparación para generar esta tabla.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="grafica grafica-secundaria"><canvas id="graficoErrores"></canvas></div>
+        </section>
+
+        <section class="seccion">
+            <h2>10. Análisis de precisión</h2>
+            <div id="analisis">
+                <p>Ejecute la simulación para obtener el análisis comparativo de los métodos numéricos.</p>
+            </div>
+        </section>
+
+        <section class="seccion">
+            <h2>11. Interpretación física y limitaciones</h2>
+            <p>
+                La gravedad incrementa la rapidez de caída, mientras que la resistencia del aire
+                se opone al movimiento. En este modelo simplificado, la magnitud de la velocidad
+                se aproxima a una velocidad terminal cuando la fuerza de resistencia equilibra
+                el peso.
+            </p>
+            <p>
+                El modelo supone gravedad y coeficiente de resistencia constantes. No contempla
+                variaciones de densidad atmosférica, calentamiento, ablación, fragmentación,
+                cambios de forma ni variaciones de masa del asteroide.
+            </p>
+        </section>
+
+        <section class="seccion">
+            <h2>12. Conclusiones</h2>
+            <div id="conclusiones">
+                <p>Las conclusiones se actualizarán al ejecutar la simulación.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer><p>Simulador de caída atmosférica</p></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
